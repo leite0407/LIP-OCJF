@@ -268,9 +268,9 @@ void dimuon::FitPeakRoofit() {
   // Declare observable mass
   RooRealVar mass("mass","mass",_mmin,_mmax);
 
-  RooRealVar mean1("mass","mass",_mmin,(mass_peak1+mass_peak2)/2.);
-  RooRealVar mean2("mass","mass",(mass_peak1+mass_peak2)/2.,(mass_peak3+mass_peak2)/2.);
-  RooRealVar mean3("mass","mass",(mass_peak3+mass_peak2)/2.,_mmax);
+  RooRealVar mean1("mean1","mean1",_mmin,(mass_peak1+mass_peak2)/2.);
+  RooRealVar mean2("mean2","mean2",(mass_peak1+mass_peak2)/2.,(mass_peak3+mass_peak2)/2.);
+  RooRealVar mean3("mean3","mean3",(mass_peak3+mass_peak2)/2.,_mmax);
 
 
   // Create a binned dataset that imports contents of TH1 and associates its contents to observable 'mass'
