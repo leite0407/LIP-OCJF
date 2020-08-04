@@ -309,18 +309,29 @@ void dimuon::FitPeakRoofit() {
   double n_signal_initial2 = (dh.sumEntries(TString::Format("abs(mass-%g)<0.015",mass_peak2)) - dh.sumEntries(TString::Format("abs(mass-%g)<0.030&&abs(mass-%g)>0.015",mass_peak2,mass_peak2))) / dh.sumEntries();
   double n_signal_initial3 = (dh.sumEntries(TString::Format("abs(mass-%g)<0.015",mass_peak3)) - dh.sumEntries(TString::Format("abs(mass-%g)<0.030&&abs(mass-%g)>0.015",mass_peak3,mass_peak3))) / dh.sumEntries();
   
+  double n_signal_initial_total = n_signal_initial1 + n_signal_initial2 + n_signal_initial3;
+
+
+  RooRealVar frac1("frac1","frac1",0.333,0.,1.);
+  RooRealVar frac2("frac2","frac2",0.333,0.,1.);
+
+  RooAddPdf* signal;
+  signal = new RooAddPdf("signal", "signal", RooArgList(gaussian1, gaussian2, gaussian3), RooArgList(frac1, frac2));
 
   //if(n_signal_initial<0)  n_signal_initial=1;
 
   double n_back_initial = 1. - n_signal_initial1 - n_signal_initial2 - n_signal_initial3;
 
-  RooRealVar n_signal1("n_signal","n_signal",n_signal_initial1,0.,dh.sumEntries());
-  RooRealVar n_signal2("n_signal","n_signal",n_signal_initial2,0.,dh.sumEntries());
-  RooRealVar n_signal3("n_signal","n_signal",n_signal_initial3,0.,dh.sumEntries());
+  RooRealVar n_signal1("n_signal1","n_signal1",n_signal_initial1,0.,dh.sumEntries());
+  RooRealVar n_signal2("n_signal2","n_signal2",n_signal_initial2,0.,dh.sumEntries());
+  RooRealVar n_signal3("n_signal3","n_signal3",n_signal_initial3,0.,dh.sumEntries());
+  RooRealVar n_signal_total("n_signal_total","n_signal_total",n_signal_initial_total,0.,dh.sumEntries());
+    
+
   RooRealVar n_back("n_back","n_back",n_back_initial,0.,dh.sumEntries());
 
   RooAddPdf* model;
-  model = new RooAddPdf("model","model", RooArgList(gaussian2, gaussian3, gaussian1, background), RooArgList(n_signal1, n_signal2, n_signal3));
+  model = new RooAddPdf("model","model", RooArgList(*signal, background), RooArgList(n_signal_total, n_back));
 
   model->fitTo(dh);
 
@@ -335,9 +346,6 @@ void dimuon::FitPeakRoofit() {
   frame->SetYTitle(Form("Events / %3.1f MeV/c^{2}",hpeak->GetBinWidth(1)*1000));
   frame->Draw("");
   roofit_canvas.SaveAs("plots/myroo.png");
-
-
-
 }
 
 
