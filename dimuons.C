@@ -268,9 +268,9 @@ void dimuon::FitPeakRoofit() {
   // Declare observable mass
   RooRealVar mass("mass","mass",_mmin,_mmax);
 
-  RooRealVar mass1("mass","mass",_mmin,(mass_peak1+mass_peak2)/2.);
-  RooRealVar mass2("mass","mass",(mass_peak1+mass_peak2)/2.,(mass_peak3+mass_peak2)/2.);
-  RooRealVar mass3("mass","mass",(mass_peak3+mass_peak2)/2.,_mmax);
+  RooRealVar mean1("mass","mass",_mmin,(mass_peak1+mass_peak2)/2.);
+  RooRealVar mean2("mass","mass",(mass_peak1+mass_peak2)/2.,(mass_peak3+mass_peak2)/2.);
+  RooRealVar mean3("mass","mass",(mass_peak3+mass_peak2)/2.,_mmax);
 
 
   // Create a binned dataset that imports contents of TH1 and associates its contents to observable 'mass'
@@ -283,11 +283,6 @@ void dimuon::FitPeakRoofit() {
   //background model -> other functions would be possible
   RooRealVar lambda("lambda","lambda",-0.3,-4.,0.);
   RooExponential background("background", "background", mass, lambda);
-
-  //signal model
-  RooRealVar mean1("mean","mean",mass_peak1,mass_peak1-0.00026,mass_peak1+0.00026);
-  RooRealVar mean2("mean","mean",mass_peak2,mass_peak2-0.00031,mass_peak2+0.00031);
-  RooRealVar mean3("mean","mean",mass_peak3,mass_peak3-0.0005,mass_peak3+0.0005);
 
   RooRealVar sigma("sigma","sigma",0.05*(_mmax-_mmin),0.,0.5*(_mmax-_mmin));
 
@@ -326,17 +321,19 @@ void dimuon::FitPeakRoofit() {
   RooRealVar n_signal2("n_signal2","n_signal2",n_signal_initial2,0.,dh.sumEntries());
   RooRealVar n_signal3("n_signal3","n_signal3",n_signal_initial3,0.,dh.sumEntries());
   RooRealVar n_signal_total("n_signal_total","n_signal_total",n_signal_initial_total,0.,dh.sumEntries());
-    
+
 
   RooRealVar n_back("n_back","n_back",n_back_initial,0.,dh.sumEntries());
+
 
   RooAddPdf* model;
   model = new RooAddPdf("model","model", RooArgList(*signal, background), RooArgList(n_signal_total, n_back));
 
   model->fitTo(dh);
 
-  model->plotOn(frame,Components("signal1"),LineStyle(kDashed), LineColor(kGreen)) ;
-  model->plotOn(frame,Components("background"),LineStyle(kDashed),LineColor(kRed)) ;
+  model->plotOn(frame,Components("signal1"),LineStyle(kDashed), LineColor(kGreen));
+  model->plotOn(frame,Components("signal1"),LineStyle(kDashed), LineColor(kBlue));
+  model->plotOn(frame,Components("background"),LineStyle(kDashed),LineColor(kRed));
 
   model->plotOn(frame) ;
 
@@ -363,5 +360,3 @@ Double_t fitfun(Double_t *x, Double_t *par) {
   //the total PDF function, sum of the above
   return signal(x,par) + backgr(x,&par[3]); 
 }
-
-
